@@ -1,11 +1,28 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 
-const TopDoctors = () => {
-
-  const navigate = useNavigate()
+const RelatedDoctors = ({ speciality, docId }) => {
   const { doctors } = useContext(AppContext)
+  const navigate = useNavigate()
+  const [relDoc, setRelDocs] = useState([])
+  const [clicked, setClicked] = useState({})
+
+  useEffect(() => {
+    if (doctors.length > 0 && speciality) {
+      const doctorsData = doctors.filter(
+        (doc) => doc.speciality === speciality && doc._id !== docId
+      )
+      setRelDocs(doctorsData)
+    }
+  }, [doctors, speciality, docId])
+
+  const handleImageClick = (id) => {
+    setClicked((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }))
+  }
 
   return (
     <div className='flex flex-col items-center gap-4 my-16 text-gray-900 md:mx-10'>
@@ -14,15 +31,21 @@ const TopDoctors = () => {
         Find and book appointments with top-rated doctors near you for expert care and trusted medical advice.
       </p>
 
-      {/* Grid for 2 rows */}
       <div className='w-full grid grid-cols-2 md:grid-cols-5 gap-4 pt-5 gap-y-6 px-3 sm:px-0'>
-        {doctors.slice(0, 10).map((item, index) => (
+        {relDoc.slice(0, 5).map((item, index) => (
           <div
-            onClick={() => {navigate(`/appoinment/${item._id}`);scrollTo(0,0)}}
+            onClick={() => {
+              handleImageClick(item._id)
+              // navigate(`/appoinment/${item._id}`); // remove this if you only want image toggle
+            }}
             className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500'
             key={index}
           >
-            <img className='bg-blue-50 w-full h-40 object-cover' src={item.image} alt='' />
+            <img
+              className='bg-blue-50 w-full h-40 object-cover'
+              src={clicked[item._id] ? item.image2 : item.image}
+              alt=''
+            />
             <div className='p-4'>
               <div className='flex items-center gap-2 text-sm text-green-500'>
                 <p className='w-2 h-2 bg-green-500 rounded-full'></p>
@@ -35,11 +58,10 @@ const TopDoctors = () => {
         ))}
       </div>
 
-      {/* Single "More" button below the grid */}
       <button
         onClick={() => {
           navigate('/doctors')
-          scrollTo(0, 0)
+          window.scrollTo(0, 0)
         }}
         className='bg-blue-50 text-gray-600 px-12 py-3 rounded-full mt-10'
       >
@@ -49,4 +71,4 @@ const TopDoctors = () => {
   )
 }
 
-export default TopDoctors
+export default RelatedDoctors
