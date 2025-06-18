@@ -50,7 +50,7 @@ const Doctors = () => {
                 key={index}
               >
                 <img
-                  className='bg-blue-50 w-full h-28 object-container'
+                  className='bg-blue-50 w-full h-50 object-container'
                   src={item.image}
                   alt={item.name}
                 />
